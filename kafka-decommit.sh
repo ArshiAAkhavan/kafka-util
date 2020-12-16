@@ -143,6 +143,10 @@ while [[ $# -gt 0 ]]; do
       declare -r KAFKA_LAST_BROKER_ID="$1"
       shift
       ;;
+    -o|--leader-only)
+      shift
+      declare -r LEADER_ONLY="true"
+      ;;  
     -h|--help)
       print_usage
       exit 98
@@ -369,7 +373,7 @@ function replace_broker_with {
 # "Header" of JSON file for Kafka partition reassignment
 json="{\n"
 json="$json  \"partitions\": [\n"
-
+echo "$KAFKA_TOPICS_BIN"
 # Actual partition reassignments
 for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
   # Note: We use '#' as field separator in awk (see above) and here
@@ -385,6 +389,22 @@ for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT 
   fi
   json="$json    {\"topic\": \"${topic}\", \"partition\": ${partition}, \"replicas\": [${new_replicas}] },\n"
 done
+if [[ "$LEADER_ONLY" != "true" ]];then
+  for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep "Replicas:.*$BROKER" | grep -v "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
+    # Note: We use '#' as field separator in awk (see above) and here
+    # because it is not a valid character for a Kafka topic name.
+    IFS=$'#' read -a array <<< "$topicPartitionReplicas"
+    topic="${array[0]}"     # e.g. "zerg.hydra"
+    partition="${array[1]}" # e.g. "4"
+    replicas="${array[2]}"  # e.g. "0,8"  (= comma-separated list of broker IDs)
+    [[ -z "$REPLACE_ID" ]] && new_replicas=`replace_broker $replicas $BROKER` || new_replicas=`replace_broker_with $replicas $BROKER $REPLACE_ID`
+    if [ -z "$new_replicas" ]; then
+      echo "ERROR: Cannot find any replacement broker.  Maybe you have only a single broker in your cluster?"
+      exit 60
+    fi
+    json="$json    {\"topic\": \"${topic}\", \"partition\": ${partition}, \"replicas\": [${new_replicas}] },\n"
+  done
+fi
 
 # Remove tailing comma, if any.
 json=${json%",\n"}
