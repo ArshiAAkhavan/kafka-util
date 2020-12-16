@@ -68,6 +68,8 @@ print_usage() {
   echo "    -r, --replace-with     Move leadership of all replicas, if any, from this broker"
   echo "                           to the specified broker.  Example: 4"
   echo "                           only one of the --replace-with and" 
+  echo "    -x, --exclude          exclude given id from target lists.ignored if used with "
+  echo "                           --replace-with"
   echo "                           <--first-brocker-id|--last-broker-id> should be used" 
   echo "    -z, --zookeeper        Comma-separated list of ZK servers with which the brokers"
   echo "                           are registered.  Example: zookeeper1:2181,zookeeper2:2181"
