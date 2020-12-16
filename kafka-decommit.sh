@@ -73,6 +73,8 @@ print_usage() {
   echo "                           <--first-brocker-id|--last-broker-id> should be used" 
   echo "    -z, --zookeeper        Comma-separated list of ZK servers with which the brokers"
   echo "                           are registered.  Example: zookeeper1:2181,zookeeper2:2181"
+  echo "    -o, --leader-only      if used, it would only generate partition assignment for "
+  echo "                           partition which the brocker is leader of"
   echo "    -h, --help             Print this help message and exit."
   echo
   echo "Example"
