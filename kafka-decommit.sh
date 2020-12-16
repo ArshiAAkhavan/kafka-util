@@ -375,7 +375,6 @@ function replace_broker_with {
 # "Header" of JSON file for Kafka partition reassignment
 json="{\n"
 json="$json  \"partitions\": [\n"
-echo "$KAFKA_TOPICS_BIN"
 # Actual partition reassignments
 for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
   # Note: We use '#' as field separator in awk (see above) and here
