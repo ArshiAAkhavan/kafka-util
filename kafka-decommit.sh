@@ -391,7 +391,7 @@ for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT 
   json="$json    {\"topic\": \"${topic}\", \"partition\": ${partition}, \"replicas\": [${new_replicas}] },\n"
 done
 if [[ "$LEADER_ONLY" != "true" ]];then
-  for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep "Replicas:.*$BROKER" | grep -v "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
+  for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep -E "(Replicas: $BROKER)|(Replicas:.*,$BROKER)" | grep -v "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
     # Note: We use '#' as field separator in awk (see above) and here
     # because it is not a valid character for a Kafka topic name.
     IFS=$'#' read -a array <<< "$topicPartitionReplicas"
