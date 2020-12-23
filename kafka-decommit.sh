@@ -208,7 +208,7 @@ EXCLUDE_LIST=${EXCLUDE_LIST#","}
 
 declare -r KAFKA_TOPICS_SCRIPT_NAME_APACHE="kafka-topics.sh"
 declare -r KAFKA_TOPICS_SCRIPT_NAME_CONFLUENT="kafka-topics"
-if [ -z "$KAFKA_LAST_BROKER_ID" ];then
+if [ -z "$KAFKA_BINARY_PATH" ];then
     declare -r FALLBACK_PATH="/opt/kafka_2.10-0.8.2.1/bin"
 else
     declare -r FALLBACK_PATH="$KAFKA_BINARY_PATH"
