@@ -145,6 +145,11 @@ while [[ $# -gt 0 ]]; do
       declare -r KAFKA_LAST_BROKER_ID="$1"
       shift
       ;;
+    -p|--kafka-binary-path)
+      shift
+      declare -r KAFKA_BINARY_PATH="$1"
+      shift
+      ;;  
     -o|--leader-only)
       shift
       declare -r LEADER_ONLY="true"
@@ -200,7 +205,11 @@ EXCLUDE_LIST=${EXCLUDE_LIST#","}
 
 declare -r KAFKA_TOPICS_SCRIPT_NAME_APACHE="kafka-topics.sh"
 declare -r KAFKA_TOPICS_SCRIPT_NAME_CONFLUENT="kafka-topics"
-declare -r FALLBACK_PATH="/opt/kafka_2.10-0.8.2.1/bin"
+if [ -z "$KAFKA_LAST_BROKER_ID" ];then
+    declare -r FALLBACK_PATH="/opt/kafka_2.10-0.8.2.1/bin"
+else
+    declare -r FALLBACK_PATH="$KAFKA_BINARY_PATH"
+fi
 
 which "$KAFKA_TOPICS_SCRIPT_NAME_CONFLUENT" &>/dev/null
 if [ $? -ne 0 ]; then
