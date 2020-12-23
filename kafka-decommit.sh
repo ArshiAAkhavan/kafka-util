@@ -59,6 +59,9 @@ print_usage() {
   echo
   echo "    -b, --broker-id        Move leadership of all replicas, if any, from this broker"
   echo "                           to different, randomly selected brokers.  Example: 4"
+  echo "    -p, --kafka-bin-path   path to kafka binary directory, if not set, script will"
+  echo "                           use its predefines, use it in case you got 'the "
+  echo "                           kafka-topics CLI tool (ships with Kafka) not found in PATH'"
   echo "    -f, --first-broker-id  First (= lowest) Kafka broker ID in the cluster.  Used as"
   echo "                           the start index for the range of broker IDs from which"
   echo "                           replacement brokers will be randomly selected.  Example: 0"
@@ -145,7 +148,7 @@ while [[ $# -gt 0 ]]; do
       declare -r KAFKA_LAST_BROKER_ID="$1"
       shift
       ;;
-    -p|--kafka-binary-path)
+    -p|--kafka-bin-path)
       shift
       declare -r KAFKA_BINARY_PATH="$1"
       shift
