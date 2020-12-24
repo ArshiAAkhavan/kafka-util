@@ -388,7 +388,7 @@ function replace_broker_with {
 json="{\n"
 json="$json  \"partitions\": [\n"
 # Actual partition reassignments
-for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
+for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep -w "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
   # Note: We use '#' as field separator in awk (see above) and here
   # because it is not a valid character for a Kafka topic name.
   IFS=$'#' read -a array <<< "$topicPartitionReplicas"
@@ -403,7 +403,7 @@ for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT 
   json="$json    {\"topic\": \"${topic}\", \"partition\": ${partition}, \"replicas\": [${new_replicas}] },\n"
 done
 if [[ "$LEADER_ONLY" != "true" ]];then
-  for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep -E "(Replicas: $BROKER)|(Replicas:.*,$BROKER)" | grep -v "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
+  for topicPartitionReplicas in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe | grep -wE "(Replicas: $BROKER)|(Replicas:.*,$BROKER)" | grep -vw "Leader: $BROKER" | awk '{ print $2"#"$4"#"$8 }'`; do
     # Note: We use '#' as field separator in awk (see above) and here
     # because it is not a valid character for a Kafka topic name.
     IFS=$'#' read -a array <<< "$topicPartitionReplicas"
