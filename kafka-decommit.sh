@@ -87,7 +87,7 @@ print_usage() {
   echo "from the broker with ID 4 to brokers randomly selected from the ID range 0,1,2,3,4,5,6,7,8"
   echo "(though 4 itself will be excluded from the range automatically):"
   echo
-  echo "    $ $MYSELF --broker-id 4 --first-broker-id 0 --last-broker-id 8 --zookeeper zookeeper1:2181"
+  echo "    $ $MYSELF --broker-id 4 --leader-only --first-broker-id 0 --last-broker-id 8 --zookeeper zookeeper1:2181"
   echo
   echo "Use cases include:"
   echo "------------------"
