@@ -400,14 +400,13 @@ json="{\n"
 json="$json  \"partitions\": [\n"
 
 # Actual partition reassignments
-for partition in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --topic $TOPIC | awk '{ print $4"#"$8 }'`; do
+for partition_assignment in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --topic $TOPIC | awk '{ print $4"#"$8 }'`; do
   # Note: We use '#' as field separator in awk (see above) and here
   # because it is not a valid character for a Kafka topic name.
-  IFS=$'#' read -a array <<< "$partition"
+  IFS=$'#' read -a array <<< "$partition_assignment"
   partition="${array[0]}" # e.g. "4"
   replicas="${array[1]}"  # e.g. "0,8"  (= comma-separated list of broker IDs)
   
-  echo "in main=$REPLICATION"
   new_replicas=`scale $replicas $REPLICATION`
   
   if [ -z "$new_replicas" ]; then
