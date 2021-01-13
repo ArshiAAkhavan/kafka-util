@@ -378,9 +378,7 @@ function exclude_brokers2 {
 }
 
 function scale {
-  # local 1=$1
-  # local 2=$2
-  
+
   local to_be_excluded=`echo "${EXCLUDE_LIST},$1" | sed 's/^,//g' | sed 's/,$//g'`
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
   local broker_range=`exclude_brokers2 $range $to_be_excluded`
@@ -388,10 +386,7 @@ function scale {
   
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
   new_partitions=("${new_partitions[@]:0:$2}")
-  if [ $2 -lt 0 ] || [ $2 -gt ${#new_partitions[@]} ];then
-    echo $replicast
-    exit 10
-  fi
+  
   retval=`echo "${new_partitions[@]}"| tr ' ' ',' | sed 's/^,//g' | sed 's/,$//g'`
   echo "$retval"
 }
@@ -414,11 +409,11 @@ for partition in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --
   
   echo "in main=$REPLICATION"
   new_replicas=`scale $replicas $REPLICATION`
-  # [[ -z "$REPLACE_ID" ]] && new_replicas=`replace_broker $replicas $BROKER` || new_replicas=`replace_broker_with $replicas $BROKER $REPLACE_ID`
-  # if [ -z "$new_replicas" ]; then
-  #   echo "ERROR: Cannot find any replacement broker.  Maybe you have only a single broker in your cluster?"
-  #   exit 60
-  # fi
+  
+  if [ -z "$new_replicas" ]; then
+      echo "ERROR: Cannot find any reassignment for partition $partition"
+      exit 60
+  fi
   json="$json    {\"topic\": \"${TOPIC}\", \"partition\": ${partition}, \"replicas\": [${new_replicas}] },\n"
 done
 
