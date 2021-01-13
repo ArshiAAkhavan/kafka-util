@@ -380,6 +380,7 @@ function exclude_brokers2 {
 function scale {
   local replicas=$1
   local replication=$2
+  echo "replication=$replication"
 
   local to_be_excluded=`echo "${EXCLUDE_LIST},$replicas" | sed 's/^,//g' | sed 's/,$//g'`
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
