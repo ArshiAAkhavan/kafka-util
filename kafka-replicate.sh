@@ -410,10 +410,10 @@ for partition_assignment in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --
   
   new_replicas=`scale $replicas $REPLICATION`
   
-  if [ -z "$new_replicas" ]; then
-      echo "ERROR: Cannot find any reassignment for partition $partition"
-      exit 60
-  fi
+  # if [ -z "$new_replicas" ]; then
+  #     echo "ERROR: Cannot find any reassignment for partition $partition"
+  #     exit 60
+  # fi
   json="$json    {\"topic\": \"${TOPIC}\", \"partition\": ${partition}, \"replicas\": [${new_replicas}] },\n"
 done
 
