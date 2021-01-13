@@ -407,7 +407,7 @@ json="{\n"
 json="$json  \"partitions\": [\n"
 
 # Actual partition reassignments
-for partition in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --topic $TOPIC | awk '{ print "$4"#"$8 }'`; do
+for partition in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --topic $TOPIC | awk '{ print $4"#"$8 }'`; do
   # Note: We use '#' as field separator in awk (see above) and here
   # because it is not a valid character for a Kafka topic name.
   IFS=$'#' read -a array <<< "$partition"
