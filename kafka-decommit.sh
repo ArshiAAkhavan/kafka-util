@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# File:      kafka-move-leadership.sh
+# File:      kafka-decommit.sh
 #
 # Description
 # ===========
