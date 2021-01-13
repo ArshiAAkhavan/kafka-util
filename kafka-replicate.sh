@@ -236,13 +236,38 @@ declare -r OLD_IFS="$IFS"
 ### UTILITY FUNCTIONS
 ###############################################################################
 
+# shuffles the input and returns a list with the same size but randomly indexed members
+# first param: a list of numbers seperated by ',' i.e. 1,2,103,4
+#
+# output: a random order of the given list 
+#
+# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
+
 function shuffle {
   echo $1 | tr "," "\n" | shuf | tr "\n" "," | sed 's/,$//g'
 }
 
+# takes two arrays and exclude the seconds one from the firs (just like comm buf for arrays)
+# first  param: a list of numbers seperated by ',' i.e. 1,2,103,4
+# second param: a list of numbers seperated by ',' i.e. 1,2,103,4
+#
+# output: a list of numbers seperated by ',' generated from the first param that doesnt 
+# contain any of the second params members
+#
+# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
+
 function exclude_broker {
   echo "$1" | tr ',' '\n' | grep -Eiv `echo "$2" | tr ',' '|'` | tr '\n' ',' | sed 's/,$//g'
 }
+
+# takes an array of already installed replicas and the scale which we want to reach
+# and generates an array of length "second param" starting with e "first param" 
+# first  param: a list of numbers seperated by ',' i.e. 1,2,103,4
+# second param: a number represeiting the desired replication
+#
+# output: an array of length "second param" starting with e "first param"  
+#
+# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
 
 function scale {
 
@@ -268,11 +293,12 @@ json="$json  \"partitions\": [\n"
 
 # Actual partition reassignments
 for partition_assignment in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --topic $TOPIC | tail -n +2 | awk '{ print $4"#"$8 }'`; do
+  
   # Note: We use '#' as field separator in awk (see above) and here
   # because it is not a valid character for a Kafka topic name.
   IFS=$'#' read -a array <<< "$partition_assignment"
-  partition="${array[0]}" # e.g. "4"
-  replicas="${array[1]}"  # e.g. "0,8"  (= comma-separated list of broker IDs)
+  partition="${array[0]}" 
+  replicas="${array[1]}"  
   
   new_replicas=`scale $replicas $REPLICATION`
   if [ -z "$new_replicas" ]; then
