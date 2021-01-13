@@ -378,20 +378,20 @@ function exclude_brokers2 {
 }
 
 function scale {
-  local replicas=$1
-  local replication=$2
-  echo "replication=$replication"
+  # local 1=$1
+  # local 2=$2
+  # echo "2=$2"
 
-  local to_be_excluded=`echo "${EXCLUDE_LIST},$replicas" | sed 's/^,//g' | sed 's/,$//g'`
+  local to_be_excluded=`echo "${EXCLUDE_LIST},$1" | sed 's/^,//g' | sed 's/,$//g'`
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
   
   local broker_range=`exclude_brokers2 $range $to_be_excluded`
-  broker_range=`echo "$replicas,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
+  broker_range=`echo "$1,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
 
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
-  new_Paritions=("${new_partitions[@]:0:$replication}")
+  new_Paritions=("${new_partitions[@]:0:$2}")
   
-  if [ $replication -lt 0 ] || [ $replication -gt ${#new_partitions} ];then
+  if [ $2 -lt 0 ] || [ $2 -gt ${#new_partitions} ];then
     echo $replicast
     return 1
   fi
@@ -415,7 +415,7 @@ for partition in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --
   partition="${array[0]}" # e.g. "4"
   replicas="${array[1]}"  # e.g. "0,8"  (= comma-separated list of broker IDs)
   
-  
+  echo "in main=$REPLICATION"
   $new_replicas=`scale $replicas $REPLICATION`
   # [[ -z "$REPLACE_ID" ]] && new_replicas=`replace_broker $replicas $BROKER` || new_replicas=`replace_broker_with $replicas $BROKER $REPLACE_ID`
   # if [ -z "$new_replicas" ]; then
