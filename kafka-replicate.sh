@@ -391,6 +391,8 @@ function scale {
   broker_range=`echo "$1,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
   echo "broker_range2=$broker_range" >&2
   
+  local test_t=`echo $broker_range|tr ',' ' '`
+  echo "test_t=$test_t" >&2
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
   echo "new_partitions1=$new_partitions" >&2
   new_partitions=("${new_partitions[@]:0:$2}")
