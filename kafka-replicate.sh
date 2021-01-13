@@ -393,7 +393,7 @@ function scale {
   
   local test_t=`echo $broker_range|tr ',' ' '`
   echo "test_t=$test_t" >&2
-  local new_partitions=($test_t)
+  local new_partitions
   eval "new_partitions=($test_t)"
   echo "new_partitions1=$new_partitions" >&2
   new_partitions=("${new_partitions[@]:0:$2}")
