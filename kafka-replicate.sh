@@ -394,10 +394,10 @@ function scale {
   local test_t=`echo $broker_range|tr ',' ' '`
   echo "test_t=$test_t" >&2
   # local new_partitions
-  eval "new_partitions=($test_t)"
-  echo "new_partitions1=$new_partitions" >&2
-  new_partitions=("${new_partitions[@]:0:$2}")
-  echo "new_partitions2=$new_partitions" >&2
+  eval "test_t=($test_t)"
+  echo "test_t1=$test_t" >&2
+  test_t=("${test_t[@]:0:$2}")
+  echo "test_t2=$test_t" >&2
   # if [ 2 -lt 0 ] || [ 2 -gt ${#new_partitions} ];then
   #   echo $replicast
   #   return 1
