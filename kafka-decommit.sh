@@ -39,7 +39,7 @@
 #
 # Step 1 (generate reassignment JSON; this script):
 #
-#    $ kafka-move-leadership.sh --broker-id 4 --first-broker-id 0 --last-broker-id 8 --zookeeper zookeeper1:2181 > partitions-to-move.json
+#    $ kafka-decommit.sh --broker-id 4 --first-broker-id 0 --last-broker-id 8 --zookeeper zookeeper1:2181 > partitions-to-move.json
 #
 # Step 2 (start reassignment process; Kafka built-in script):
 #
