@@ -385,7 +385,7 @@ function scale {
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
   
   local broker_range=`exclude_brokers2 $range $to_be_excluded`
-  broker_range=`echo "$replicas,${broker_range}" | sed's/^,//g' | sed's/,$//g' 
+  broker_range=`echo "$replicas,${broker_range}" | sed's/^,//g' | sed's/,$//g'` 
 
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
   new_Paritions=("${new_partitions[@]:0:$replication}")
