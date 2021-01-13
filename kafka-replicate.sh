@@ -87,12 +87,10 @@ print_usage() {
   echo
   echo "    $ $MYSELF --topic test-topic --replication 4 --first-broker-id 0 --last-broker-id 8 --zookeeper zookeeper1:2181"
   echo
-  # echo "Use cases include:"
-  # echo "------------------"
-  # echo "  1. Safely restarting a broker while minimizing risk of data loss."
-  # echo "  2. Replacing a broker."
-  # echo "  3. Preparing a broker for maintenance."
-  # echo
+  echo "Use cases include:"
+  echo "------------------"
+  echo "  1. scale up and/or down a topic."
+  echo
   echo "Detailed description"
   echo "--------------------"
   echo "Generates a Kafka partition reassignment JSON snippet to STDOUT"
