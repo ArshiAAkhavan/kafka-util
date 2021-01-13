@@ -391,19 +391,17 @@ function scale {
   broker_range=`echo "$1,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
   echo "broker_range2=$broker_range" >&2
   
-  local test_t=`echo $broker_range|tr ',' ' '`
-  echo "test_t=$test_t" >&2
-  # local new_partitions
-  eval "test_t=($test_t)"
-  echo "test_t1=$test_t" >&2
-  test_t=("${test_t[@]:0:$2}")
-  echo "test_t2=$test_t" >&2
-  # if [ 2 -lt 0 ] || [ 2 -gt ${#new_partitions} ];then
-  #   echo $replicast
-  #   return 1
-  # fi
+  local new_partitions=(`echo $broker_range|tr ',' ' '`)
+  echo "new_partitions1=${new_partitions[@]}" >&2
+  new_partitions=("${new_partitions[@]:0:1}")
+  echo "new_partitions2=${new_partitions[@]}" >&2
+    echo "${#new_partitions[@]}"
+  if [ 2 -lt 0 ] || [ 2 -gt ${#new_partitions[@]} ];then
+    echo $replicast
+    exit 10
+  fi
   
-  echo $new_partitions |  tr '\n' ',' | sed 's/^,//g' | sed 's/,$//g'
+  echo ${new_partitions[@]} |  tr '\n' ',' | sed 's/^,//g' | sed 's/,$//g'
 }
 
 ###############################################################################
