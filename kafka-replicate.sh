@@ -380,7 +380,7 @@ function exclude_brokers2 {
 function scale {
   # local 1=$1
   # local 2=$2
-  # echo "2=$2"
+  echo "2=$2" >&2
 
   local to_be_excluded=`echo "${EXCLUDE_LIST},$1" | sed 's/^,//g' | sed 's/,$//g'`
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
