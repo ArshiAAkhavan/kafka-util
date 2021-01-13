@@ -415,7 +415,7 @@ for partition in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --
   replicas="${array[1]}"  # e.g. "0,8"  (= comma-separated list of broker IDs)
   
   
-  $new_replicas=`scale $replicas $REPLICATION
+  $new_replicas=`scale $replicas $REPLICATION`
   # [[ -z "$REPLACE_ID" ]] && new_replicas=`replace_broker $replicas $BROKER` || new_replicas=`replace_broker_with $replicas $BROKER $REPLACE_ID`
   # if [ -z "$new_replicas" ]; then
   #   echo "ERROR: Cannot find any replacement broker.  Maybe you have only a single broker in your cluster?"
