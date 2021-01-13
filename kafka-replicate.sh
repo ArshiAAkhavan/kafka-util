@@ -380,23 +380,15 @@ function exclude_brokers2 {
 function scale {
   # local 1=$1
   # local 2=$2
-  echo "2=$2" >&2
-
+  
   local to_be_excluded=`echo "${EXCLUDE_LIST},$1" | sed 's/^,//g' | sed 's/,$//g'`
-  echo "to_be_excluded=$to_be_excluded" >&2
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
-  echo "range=$range" >&2
   local broker_range=`exclude_brokers2 $range $to_be_excluded`
-  echo "broker_range1=$broker_range" >&2
   broker_range=`echo "$1,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
-  echo "broker_range2=$broker_range" >&2
   
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
-  echo "new_partitions1=${new_partitions[@]}" >&2
-  new_partitions=("${new_partitions[@]:0:2}")
-  echo "new_partitions2=${new_partitions[@]}" >&2
-  echo "${#new_partitions[@]}" >&2
-  if [ 2 -lt 0 ] || [ 2 -gt ${#new_partitions[@]} ];then
+  new_partitions=("${new_partitions[@]:0:$2}")
+  if [ $2 -lt 0 ] || [ $2 -gt ${#new_partitions[@]} ];then
     echo $replicast
     exit 10
   fi
