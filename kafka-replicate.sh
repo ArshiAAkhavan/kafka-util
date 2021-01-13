@@ -252,7 +252,6 @@ function scale {
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
   new_partitions=("${new_partitions[@]:0:$2}")
   
-  echo "${new_partitions[@]}" >&2
   retval=`echo "${new_partitions[@]}"| tr ' ' ',' | sed 's/^,//g' | sed 's/,$//g'`
   echo "$retval"
 }
