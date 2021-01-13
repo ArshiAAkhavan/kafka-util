@@ -238,142 +238,7 @@ declare -r OLD_IFS="$IFS"
 ### UTILITY FUNCTIONS
 ###############################################################################
 
-# Checks whether an array (first param) contains an element (second param).
-# Returns 0 if the array contains the element, and 1 if it does not.
-#
-# Usage: array_contains myArray myElement
-function array_contains {
-  local array="$1[@]"
-  local seeking=$2
-  local in=1
-  for element in "${!array}"; do
-    if [[ $element == $seeking ]]; then
-      in=0
-      break
-    fi
-  done
-  return $in
-}
-
-# Randomly selects a broker ID in the range specified by
-# KAFKA_FIRST_BROKER_ID (including) and KAFKA_LAST_BROKER_ID (including).
-#
-# Usage: random_broker  => may return e.g. "6"
-function random_broker {
-  shuf -i ${KAFKA_FIRST_BROKER_ID}-${KAFKA_LAST_BROKER_ID} -n 1
-}
-
-# Randomly selects, from the list of available brokers (range specified by
-# KAFKA_FIRST_BROKER_ID and KAFKA_LAST_BROKER_ID), a broker ID that is not
-# already listed in the provided brokers (first param).
-#
-# Usage: other_broker "1,4,6"  => may return e.g. "2"
-#
-# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
-function other_broker {
-  local brokers_string=$1
-  local all_brokers_string=`seq -s "," ${KAFKA_FIRST_BROKER_ID} ${KAFKA_LAST_BROKER_ID}`
-  if [ ${#brokers_sttring} -ge ${#all_brokers_string} ]; then
-    local no_other_broker_available=""
-    echo $no_other_broker_available
-  else
-    IFS=$',' read -a brokers <<< "$brokers_string"
-    local new_broker=`random_broker`
-    while array_contains brokers $new_broker; do
-      new_broker=`random_broker`
-    done
-    echo $new_broker
-  fi
-}
-
-# Returns a list of broker IDs by removing the provided broker ID (second param)
-# from the provided list of original broker IDs (first param).  If the original
-# broker list does not contain the provided broker, the list is returned as is.
-#
-# The list of broker IDs must be a comma-separated list of numbers, e.g. "1,2".
-#
-# Usage: all_but_broker "1,2,3" "3"  => returns "1,2"
-#
-# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
-function all_but_broker {
-  local brokers_string=$1
-  local broker=$2
-  IFS=$',' read -a brokers <<< "$brokers_string"
-  local new_brokers=""
-  for curr_broker in "${brokers[@]}"; do
-    if [ "$curr_broker" != "$broker" ]; then
-      new_brokers="$new_brokers,$curr_broker"
-    fi
-  done
-  # Remove leading comma, if any.
-  new_brokers=${new_brokers#","}
-  echo $new_brokers
-}
-
-# Returns a list of broker IDs by removing the provided exclude_list (second param)
-# from the provided list of original broker IDs (first param).  If the original
-# broker list does not contain the provided brokers, the list is returned as is.
-#
-# The list of broker IDs must be a comma-separated list of numbers, e.g. "1,2".
-#
-# Usage: all_but_broker "1,2,3,4" "3,4"  => returns "1,2"
-#
-# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
-function exclude_brokers {
-  local brokers_string=$1
-  local exclude_string=$2
-  IFS=$',' read -a brokers <<< "$exclude_string"
-  local new_brokers=""
-  for ex_broker in "${brokers[@]}"; do
-    new_brokers=`all_but_broker $brokers_string $ex_broker`  
-  done
-  # Remove leading comma, if any.
-  new_brokers=${new_brokers#","}
-  echo $new_brokers
-}
-
-
-# Returns a list of broker IDs based on a provided list of broker IDs (first
-# param), where the provided broker ID (second param) is replaced by a
-# randomly selected broker ID that is not already in the original list.
-#
-# Usage: replace_broker "1,2,3" "2"  => may return e.g. "1,3,4"
-#
-# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
-function replace_broker {
-  local brokers_string="$1"
-  local broker=$2
-  local remaining_brokers=`all_but_broker $brokers_string $broker`
-  local replacement_broker=`other_broker $brokers_string,$EXCLUDE_LIST`
-  new_brokers="$remaining_brokers,$replacement_broker"
-  # Remove leading comma, if any.
-  new_brokers=${new_brokers#","}
-  # Remove trailing comma, if any.
-  new_brokers=${new_brokers%","}
-  echo $new_brokers
-}
-
-# Returns a list of broker IDs based on a provided list of broker IDs (first
-# param), where the provided broker ID (second param) is replaced by a
-# randomly selected broker ID that is not already in the original list.
-#
-# Usage: replace_broker "1,2,3" "2"  => may return e.g. "1,3,4"
-#
-# Note: Do NOT put spaces in the string.  "1,2" is ok, "1, 2" is not.
-function replace_broker_with {
-  local brokers_string=$1
-  local broker=$2
-  local replacement_broker=$3
-  local remaining_brokers=`all_but_broker $brokers_string $broker`
-  new_brokers="$remaining_brokers,$replacement_broker"
-  # Remove leading comma, if any.
-  new_brokers=${new_brokers#","}
-  # Remove trailing comma, if any.
-  new_brokers=${new_brokers%","}
-  echo $new_brokers
-}
-
-function exclude_brokers2 {
+function exclude_broker {
   echo "$1" | tr ',' '\n' | grep -Eiv `echo "$2" | tr ',' '|'` | tr '\n' ',' | sed 's/,$//g'
 }
 
@@ -381,7 +246,7 @@ function scale {
 
   local to_be_excluded=`echo "${EXCLUDE_LIST},$1" | sed 's/^,//g' | sed 's/,$//g'`
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
-  local broker_range=`exclude_brokers2 $range $to_be_excluded`
+  local broker_range=`exclude_broker $range $to_be_excluded`
   broker_range=`echo "$1,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
   
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
