@@ -389,14 +389,14 @@ function scale {
   broker_range=`echo "$1,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
 
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
-  new_paritions=("${new_partitions[@]:0:$2}")
+  new_partitions=("${new_partitions[@]:0:$2}")
   # echo 
   # if [ 2 -lt 0 ] || [ 2 -gt ${#new_partitions} ];then
   #   echo $replicast
   #   return 1
   # fi
   
-  echo $new_paritions |  tr '\n' ',' | sed 's/^,//g' | sed 's/,$//g'
+  echo $new_partitions |  tr '\n' ',' | sed 's/^,//g' | sed 's/,$//g'
 }
 
 ###############################################################################
