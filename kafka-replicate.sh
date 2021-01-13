@@ -388,7 +388,7 @@ function scale {
   
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
   new_partitions=("${new_partitions[@]:0:$2}")
-  if [ $2 -lt 0 ] || [ $2 -gt ${#new_partitions[@]} ];then
+  if [ "$2" -lt 0 ] || [ $2 -gt ${#new_partitions[@]} ];then
     echo $replicast
     exit 10
   fi
