@@ -381,11 +381,11 @@ function scale {
   local replicas=$1
   local replication=$2
 
-  local to_be_excluded=`echo "${EXCLUDE_LIST},$replicas" | sed's/^,//g' | sed 's/,$//g'`
+  local to_be_excluded=`echo "${EXCLUDE_LIST},$replicas" | sed 's/^,//g' | sed 's/,$//g'`
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
   
   local broker_range=`exclude_brokers2 $range $to_be_excluded`
-  broker_range=`echo "$replicas,${broker_range}" | sed's/^,//g' | sed's/,$//g'` 
+  broker_range=`echo "$replicas,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
 
   local new_partitions=(`echo $broker_range|tr ',' ' '`)
   new_Paritions=("${new_partitions[@]:0:$replication}")
@@ -395,7 +395,7 @@ function scale {
     return 1
   fi
   
-  echo $new_Paritions |  tr '\n' ',' | sed's/^,//g' | sed 's/,$//g'
+  echo $new_Paritions |  tr '\n' ',' | sed 's/^,//g' | sed 's/,$//g'
 }
 
 ###############################################################################
