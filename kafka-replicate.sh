@@ -401,7 +401,7 @@ json="{\n"
 json="$json  \"partitions\": [\n"
 
 # Actual partition reassignments
-for partition_assignment in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --topic $TOPIC | awk '{ print $4"#"$8 }'`; do
+for partition_assignment in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --describe --topic $TOPIC | tail -n +2 | awk '{ print $4"#"$8 }'`; do
   # Note: We use '#' as field separator in awk (see above) and here
   # because it is not a valid character for a Kafka topic name.
   IFS=$'#' read -a array <<< "$partition_assignment"
@@ -410,10 +410,10 @@ for partition_assignment in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --
   
   new_replicas=`scale $replicas $REPLICATION`
   echo "new_replicas is $new_replicas" >&2
-  # if [ -z "$new_replicas" ]; then
-  #     echo "ERROR: Cannot find any reassignment for partition $partition"
-  #     exit 60
-  # fi
+  if [ -z "$new_replicas" ]; then
+      echo "ERROR: Cannot find any reassignment for partition $partition"
+      exit 60
+  fi
   json="$json    {\"topic\": \"${TOPIC}\", \"partition\": ${partition}, \"replicas\": [${new_replicas}] },\n"
 done
 
