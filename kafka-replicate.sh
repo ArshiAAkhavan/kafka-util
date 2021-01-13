@@ -409,7 +409,7 @@ for partition_assignment in `$KAFKA_TOPICS_BIN --zookeeper $ZOOKEEPER_CONNECT --
   replicas="${array[1]}"  # e.g. "0,8"  (= comma-separated list of broker IDs)
   
   new_replicas=`scale $replicas $REPLICATION`
-  
+  echo "new_replicas is $new_replicas" >&2
   # if [ -z "$new_replicas" ]; then
   #     echo "ERROR: Cannot find any reassignment for partition $partition"
   #     exit 60
