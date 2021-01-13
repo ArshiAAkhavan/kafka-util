@@ -238,6 +238,10 @@ declare -r OLD_IFS="$IFS"
 ### UTILITY FUNCTIONS
 ###############################################################################
 
+function shuffle {
+  echo $1 | tr "," "\n" | shuf | tr "\n" "," | sed 's/,$//g'
+}
+
 function exclude_broker {
   echo "$1" | tr ',' '\n' | grep -Eiv `echo "$2" | tr ',' '|'` | tr '\n' ',' | sed 's/,$//g'
 }
@@ -246,14 +250,14 @@ function scale {
 
   local to_be_excluded=`echo "${EXCLUDE_LIST},$1" | sed 's/^,//g' | sed 's/,$//g'`
   local range=`seq -s "," $KAFKA_FIRST_BROKER_ID $KAFKA_LAST_BROKER_ID`
-  local broker_range=`exclude_broker $range $to_be_excluded`
-  broker_range=`echo "$1,${broker_range}" | sed 's/^,//g' | sed 's/,$//g'` 
+  local broker_list=`exclude_broker $range $to_be_excluded`
+  local shuffled=`shuffle $broker_list`
+  broker_list=`echo "$1,${shuffled}" | sed 's/^,//g' | sed 's/,$//g'` 
   
-  local new_partitions=(`echo $broker_range|tr ',' ' '`)
+  local new_partitions=(`echo $broker_list|tr ',' ' '`)
   new_partitions=("${new_partitions[@]:0:$2}")
   
-  retval=`echo "${new_partitions[@]}"| tr ' ' ',' | sed 's/^,//g' | sed 's/,$//g'`
-  echo "$retval"
+  echo "${new_partitions[@]}"| tr ' ' ',' | sed 's/^,//g' | sed 's/,$//g'
 }
 
 ###############################################################################
